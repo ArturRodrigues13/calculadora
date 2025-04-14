@@ -79,6 +79,7 @@ class _HomePageState extends State<HomePage> {
                         buttonTapped: () {
                           setState(() {
                             userQuestion = "";
+                            userAnswer = "";
                           });
                         },
                         buttonText: buttons[index],
@@ -90,7 +91,12 @@ class _HomePageState extends State<HomePage> {
                         buttonTapped: () {
                           setState(() {
                             if(userQuestion.isNotEmpty) {
-                               userQuestion = userQuestion.substring(0, userQuestion.length - 1);
+                              userQuestion = userQuestion.substring(0, userQuestion.length - 1);
+                              if(userQuestion.length > 0) {
+                                preResult();
+                              } else {
+                                userAnswer = "";
+                              }
                             }
                           });
                         },
@@ -114,6 +120,7 @@ class _HomePageState extends State<HomePage> {
                         buttonTapped: () {
                           setState(() {
                             userQuestion += buttons[index];
+                            isOperator(buttons[index]) ? false : preResult();
                           });
                         },
                         buttonText: buttons[index],
@@ -139,9 +146,12 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void equalPressed() {
+  void preResult() {
     String finalQuestion = userQuestion;
     finalQuestion = finalQuestion.replaceAll("x", "*");
+    if (isOperator(finalQuestion[finalQuestion.length - 1])) {
+      finalQuestion = finalQuestion.substring(0, finalQuestion.length - 1);
+    }
 
     Parser p = Parser();
     Expression exp = p.parse(finalQuestion);
@@ -149,5 +159,11 @@ class _HomePageState extends State<HomePage> {
     double eval = exp.evaluate(EvaluationType.REAL, cm);
 
     userAnswer = eval.toString();
+  }
+
+  void equalPressed() {
+
+    userQuestion = userAnswer.toString();
+    userAnswer = "";
   }
 }
