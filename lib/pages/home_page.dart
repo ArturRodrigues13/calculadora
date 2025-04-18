@@ -10,17 +10,30 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   var userQuestion = "";
   var userAnswer = "";
 
-  final List<String> buttons =
-  [
-    "C", "DEL", "%", "/",
-    "9", "8", "7", "x",
-    "6", "5", "4", "-",
-    "3", "2", "1", "+",
-    "0", ".", "RES", "="
+  final List<String> buttons = [
+    "C",
+    "DEL",
+    "%",
+    "/",
+    "9",
+    "8",
+    "7",
+    "x",
+    "6",
+    "5",
+    "4",
+    "-",
+    "3",
+    "2",
+    "1",
+    "+",
+    "0",
+    ".",
+    "RES",
+    "=",
   ];
 
   @override
@@ -29,49 +42,36 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Colors.deepPurple[100],
       body: Column(
         children: [
-
           Expanded(
             child: Container(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-
-                  SizedBox(height: 50),
+                  SizedBox(height: 1),
 
                   Container(
                     padding: EdgeInsets.all(20),
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      userQuestion,
-                      style: TextStyle(
-                        fontSize: 20
-                      ),
-                    )
+                    child: Text(userQuestion, style: TextStyle(fontSize: 20)),
                   ),
 
                   Container(
                     padding: EdgeInsets.all(20),
                     alignment: Alignment.centerRight,
-                    child: Text(
-                      userAnswer,
-                      style: TextStyle(
-                        fontSize: 20
-                      ),
-                    )
-                  )
-
+                    child: Text(userAnswer, style: TextStyle(fontSize: 20)),
+                  ),
                 ],
               ),
-            )
+            ),
           ),
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Container(
               child: Center(
                 child: GridView.builder(
                   itemCount: buttons.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4
+                    crossAxisCount: 4,
                   ),
                   itemBuilder: (BuildContext context, int index) {
                     if (index == 0) {
@@ -90,9 +90,12 @@ class _HomePageState extends State<HomePage> {
                       return Buttons(
                         buttonTapped: () {
                           setState(() {
-                            if(userQuestion.isNotEmpty) {
-                              userQuestion = userQuestion.substring(0, userQuestion.length - 1);
-                              if(userQuestion.length > 0) {
+                            if (userQuestion.isNotEmpty) {
+                              userQuestion = userQuestion.substring(
+                                0,
+                                userQuestion.length - 1,
+                              );
+                              if (userQuestion.length > 0) {
                                 preResult();
                               } else {
                                 userAnswer = "";
@@ -124,22 +127,33 @@ class _HomePageState extends State<HomePage> {
                           });
                         },
                         buttonText: buttons[index],
-                        color: isOperator(buttons[index]) ? Colors.deepPurple : Colors.deepPurple[50],
-                        textColor: isOperator(buttons[index]) ? Colors.white : Colors.deepPurple,
+                        color:
+                            isOperator(buttons[index])
+                                ? Colors.deepPurple
+                                : Colors.deepPurple[50],
+                        textColor:
+                            isOperator(buttons[index])
+                                ? Colors.white
+                                : Colors.deepPurple,
                       );
                     }
-                  }
-                )
+                  },
+                ),
               ),
-            )
-          )
+            ),
+          ),
         ],
       ),
     );
   }
 
   bool isOperator(String x) {
-    if((x == "%") || (x == "/") || (x == "x") || (x == "-") || (x == "+") || (x == "=")) {
+    if ((x == "%") ||
+        (x == "/") ||
+        (x == "x") ||
+        (x == "-") ||
+        (x == "+") ||
+        (x == "=")) {
       return true;
     } else {
       return false;
@@ -148,10 +162,10 @@ class _HomePageState extends State<HomePage> {
 
   void preResult() {
     String finalQuestion = userQuestion;
-    finalQuestion = finalQuestion.replaceAll("x", "*");
     if (isOperator(finalQuestion[finalQuestion.length - 1])) {
       finalQuestion = finalQuestion.substring(0, finalQuestion.length - 1);
     }
+    finalQuestion = finalQuestion.replaceAll("x", "*");
 
     Parser p = Parser();
     Expression exp = p.parse(finalQuestion);
@@ -162,7 +176,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void equalPressed() {
-
     userQuestion = userAnswer.toString();
     userAnswer = "";
   }
