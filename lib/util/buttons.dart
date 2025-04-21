@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class Buttons extends StatelessWidget {
-
   final color;
   final textColor;
   final String buttonText;
@@ -11,12 +10,14 @@ class Buttons extends StatelessWidget {
     this.color,
     this.textColor,
     required this.buttonText,
-    this.buttonTapped
+    this.buttonTapped,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
+      splashColor: Colors.deepPurpleAccent.shade100,
+      borderRadius: BorderRadius.circular(20),
       onTap: buttonTapped,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -27,10 +28,7 @@ class Buttons extends StatelessWidget {
             child: Center(
               child: Text(
                 buttonText,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: textColor
-                ),
+                style: TextStyle(fontSize: 20, color: textColor),
               ),
             ),
           ),

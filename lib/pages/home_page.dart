@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
     "+",
     "0",
     ".",
-    "RES",
+    "()",
     "=",
   ];
 
@@ -123,7 +123,22 @@ class _HomePageState extends State<HomePage> {
                         buttonTapped: () {
                           setState(() {
                             userQuestion += buttons[index];
-                            isOperator(buttons[index]) ? false : preResult();
+                            if (userQuestion.length > 1) {
+                              if (!isOperator(
+                                userQuestion[userQuestion.length - 2],
+                              )) {
+                                preResult();
+                              } else {
+                                if (isOperator(buttons[index])) {
+                                  userQuestion =
+                                      userQuestion.substring(
+                                        0,
+                                        userQuestion.length - 2,
+                                      ) +
+                                      buttons[index];
+                                }
+                              }
+                            }
                           });
                         },
                         buttonText: buttons[index],
@@ -153,7 +168,8 @@ class _HomePageState extends State<HomePage> {
         (x == "x") ||
         (x == "-") ||
         (x == "+") ||
-        (x == "=")) {
+        (x == "=") ||
+        (x == "()")) {
       return true;
     } else {
       return false;
