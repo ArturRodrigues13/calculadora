@@ -95,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                                 0,
                                 userQuestion.length - 1,
                               );
-                              if (userQuestion.length > 0) {
+                              if (userQuestion.isNotEmpty) {
                                 preResult();
                               } else {
                                 userAnswer = "";
@@ -123,6 +123,16 @@ class _HomePageState extends State<HomePage> {
                         buttonTapped: () {
                           setState(() {
                             userQuestion += buttons[index];
+                            if (userQuestion.length == 1) {
+                              if (isOperator(buttons[index]) &&
+                                  buttons[index] != "-") {
+                                userQuestion = "";
+                              } else {
+                                if (userQuestion != "-") {
+                                  preResult();
+                                }
+                              }
+                            }
                             if (userQuestion.length > 1) {
                               if (!isOperator(
                                 userQuestion[userQuestion.length - 2],
@@ -130,12 +140,36 @@ class _HomePageState extends State<HomePage> {
                                 preResult();
                               } else {
                                 if (isOperator(buttons[index])) {
-                                  userQuestion =
-                                      userQuestion.substring(
-                                        0,
-                                        userQuestion.length - 2,
-                                      ) +
-                                      buttons[index];
+                                  if (userQuestion.length == 2) {
+                                    userQuestion = "-";
+                                  } else if ((userQuestion[userQuestion.length -
+                                                  2] ==
+                                              "x" ||
+                                          userQuestion[userQuestion.length -
+                                                  2] ==
+                                              "/" ||
+                                          userQuestion[userQuestion.length -
+                                                  2] ==
+                                              "%") &&
+                                      buttons[index] == "-") {
+                                    userQuestion = userQuestion;
+                                  } else if (!isOperator(
+                                    userQuestion[userQuestion.length - 3],
+                                  )) {
+                                    userQuestion =
+                                        userQuestion.substring(
+                                          0,
+                                          userQuestion.length - 2,
+                                        ) +
+                                        buttons[index];
+                                  } else {
+                                    userQuestion = userQuestion.substring(
+                                      0,
+                                      userQuestion.length - 1,
+                                    );
+                                  }
+                                } else {
+                                  preResult();
                                 }
                               }
                             }
@@ -188,11 +222,21 @@ class _HomePageState extends State<HomePage> {
     ContextModel cm = ContextModel();
     double eval = exp.evaluate(EvaluationType.REAL, cm);
 
-    userAnswer = eval.toString();
+    userAnswer = formatDouble(eval);
   }
 
   void equalPressed() {
-    userQuestion = userAnswer.toString();
-    userAnswer = "";
+    if (userAnswer.isNotEmpty) {
+      userQuestion = formatDouble(double.parse(userAnswer));
+      userAnswer = "";
+    }
+  }
+
+  String formatDouble(double valor) {
+    if (valor == valor.toInt()) {
+      return valor.toInt().toString();
+    } else {
+      return valor.toString();
+    }
   }
 }
