@@ -47,15 +47,25 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  SizedBox(height: 1),
+                  SizedBox(height: 5),
 
                   Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.deepPurpleAccent.shade100,
+                    ),
                     padding: EdgeInsets.all(20),
                     alignment: Alignment.centerLeft,
                     child: Text(userQuestion, style: TextStyle(fontSize: 20)),
                   ),
 
+                  SizedBox(height: 10),
+
                   Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.deepPurpleAccent.shade100,
+                    ),
                     padding: EdgeInsets.all(20),
                     alignment: Alignment.centerRight,
                     child: Text(userAnswer, style: TextStyle(fontSize: 20)),
@@ -128,7 +138,8 @@ class _HomePageState extends State<HomePage> {
                                   buttons[index] != "-") {
                                 userQuestion = "";
                               } else {
-                                if (userQuestion != "-") {
+                                if (userQuestion != "-" &&
+                                    userQuestion != ".") {
                                   preResult();
                                 }
                               }
@@ -137,7 +148,39 @@ class _HomePageState extends State<HomePage> {
                               if (!isOperator(
                                 userQuestion[userQuestion.length - 2],
                               )) {
-                                preResult();
+                                if (buttons[index] == ".") {
+                                  // Operadores que separam os números
+                                  final operadores = ['+', '-', 'x', '/', '%'];
+
+                                  // Encontra o índice do último operador
+                                  int ultimoOperadorIndex = -1;
+                                  for (var op in operadores) {
+                                    int i = userQuestion.lastIndexOf(op);
+                                    if (i > ultimoOperadorIndex) {
+                                      ultimoOperadorIndex = i;
+                                    }
+                                  }
+
+                                  // Pega a parte do número atual (depois do último operador)
+                                  String parteAtual = userQuestion.substring(
+                                    ultimoOperadorIndex + 1,
+                                    userQuestion.length - 1,
+                                  );
+
+                                  print(parteAtual);
+
+                                  // Se já tiver um ponto nessa parte, cancela o ponto digitado agora
+                                  if (parteAtual.contains(".") &&
+                                      parteAtual[parteAtual.length - 1] !=
+                                          ".") {
+                                    userQuestion = userQuestion.substring(
+                                      0,
+                                      userQuestion.length - 1,
+                                    );
+                                  }
+                                } else {
+                                  preResult();
+                                }
                               } else {
                                 if (isOperator(buttons[index])) {
                                   if (userQuestion.length == 2) {
@@ -212,6 +255,9 @@ class _HomePageState extends State<HomePage> {
 
   void preResult() {
     String finalQuestion = userQuestion;
+    if (isOperator(finalQuestion[finalQuestion.length - 1])) {
+      finalQuestion = finalQuestion.substring(0, finalQuestion.length - 1);
+    }
     if (isOperator(finalQuestion[finalQuestion.length - 1])) {
       finalQuestion = finalQuestion.substring(0, finalQuestion.length - 1);
     }
