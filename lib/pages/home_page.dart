@@ -12,6 +12,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   var userQuestion = "";
   var userAnswer = "";
+  var parentesesFechados = true;
 
   final List<String> buttons = [
     "C",
@@ -90,6 +91,7 @@ class _HomePageState extends State<HomePage> {
                           setState(() {
                             userQuestion = "";
                             userAnswer = "";
+                            parentesesFechados = true;
                           });
                         },
                         buttonText: buttons[index],
@@ -109,6 +111,7 @@ class _HomePageState extends State<HomePage> {
                                 preResult();
                               } else {
                                 userAnswer = "";
+                                parentesesFechados = true;
                               }
                             }
                           });
@@ -122,6 +125,31 @@ class _HomePageState extends State<HomePage> {
                         buttonTapped: () {
                           setState(() {
                             equalPressed();
+                          });
+                        },
+                        buttonText: buttons[index],
+                        color: Colors.deepPurple,
+                        textColor: Colors.white,
+                      );
+                    } else if (index == buttons.length - 2) {
+                      return Buttons(
+                        buttonTapped: () {
+                          setState(() {
+                            if (parentesesFechados) {
+                              userQuestion += "(";
+                              parentesesFechados = false;
+                            } else {
+                              if (userQuestion[userQuestion.length - 1] ==
+                                  "(") {
+                                userQuestion += "(";
+                              } else {
+                                userQuestion += ")";
+                                if (contarOcorrencias(userQuestion, "(") ==
+                                    contarOcorrencias(userQuestion, ")")) {
+                                  parentesesFechados = true;
+                                }
+                              }
+                            }
                           });
                         },
                         buttonText: buttons[index],
@@ -149,34 +177,48 @@ class _HomePageState extends State<HomePage> {
                                 userQuestion[userQuestion.length - 2],
                               )) {
                                 if (buttons[index] == ".") {
-                                  // Operadores que separam os números
-                                  final operadores = ['+', '-', 'x', '/', '%'];
-
-                                  // Encontra o índice do último operador
-                                  int ultimoOperadorIndex = -1;
-                                  for (var op in operadores) {
-                                    int i = userQuestion.lastIndexOf(op);
-                                    if (i > ultimoOperadorIndex) {
-                                      ultimoOperadorIndex = i;
-                                    }
-                                  }
-
-                                  // Pega a parte do número atual (depois do último operador)
-                                  String parteAtual = userQuestion.substring(
-                                    ultimoOperadorIndex + 1,
-                                    userQuestion.length - 1,
-                                  );
-
-                                  print(parteAtual);
-
-                                  // Se já tiver um ponto nessa parte, cancela o ponto digitado agora
-                                  if (parteAtual.contains(".") &&
-                                      parteAtual[parteAtual.length - 1] !=
-                                          ".") {
+                                  if (userQuestion[userQuestion.length - 2] ==
+                                      ".") {
                                     userQuestion = userQuestion.substring(
                                       0,
                                       userQuestion.length - 1,
                                     );
+                                  } else {
+                                    // Operadores que separam os números
+                                    final operadores = [
+                                      '+',
+                                      '-',
+                                      'x',
+                                      '/',
+                                      '%',
+                                    ];
+
+                                    // Encontra o índice do último operador
+                                    int ultimoOperadorIndex = -1;
+                                    for (var op in operadores) {
+                                      int i = userQuestion.lastIndexOf(op);
+                                      if (i > ultimoOperadorIndex) {
+                                        ultimoOperadorIndex = i;
+                                      }
+                                    }
+
+                                    // Pega a parte do número atual (depois do último operador)
+                                    String parteAtual = userQuestion.substring(
+                                      ultimoOperadorIndex + 1,
+                                      userQuestion.length - 1,
+                                    );
+
+                                    print(parteAtual);
+
+                                    // Se já tiver um ponto nessa parte, cancela o ponto digitado agora
+                                    if (parteAtual.contains(".") &&
+                                        parteAtual[parteAtual.length - 1] !=
+                                            ".") {
+                                      userQuestion = userQuestion.substring(
+                                        0,
+                                        userQuestion.length - 1,
+                                      );
+                                    }
                                   }
                                 } else {
                                   preResult();
@@ -254,21 +296,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   void preResult() {
-    String finalQuestion = userQuestion;
-    if (isOperator(finalQuestion[finalQuestion.length - 1])) {
-      finalQuestion = finalQuestion.substring(0, finalQuestion.length - 1);
-    }
-    if (isOperator(finalQuestion[finalQuestion.length - 1])) {
-      finalQuestion = finalQuestion.substring(0, finalQuestion.length - 1);
-    }
-    finalQuestion = finalQuestion.replaceAll("x", "*");
+    try {
+      String finalQuestion = userQuestion;
 
-    Parser p = Parser();
-    Expression exp = p.parse(finalQuestion);
-    ContextModel cm = ContextModel();
-    double eval = exp.evaluate(EvaluationType.REAL, cm);
+      while (finalQuestion.isNotEmpty &&
+          isOperator(finalQuestion[finalQuestion.length - 1])) {
+        finalQuestion = finalQuestion.substring(0, finalQuestion.length - 1);
+      }
 
-    userAnswer = formatDouble(eval);
+      finalQuestion = finalQuestion.replaceAll("x", "*");
+
+      Parser p = Parser();
+      Expression exp = p.parse(finalQuestion);
+      ContextModel cm = ContextModel();
+      double eval = exp.evaluate(EvaluationType.REAL, cm);
+
+      userAnswer = formatDouble(eval);
+    } catch (e) {
+      // Erro na Operação
+    }
   }
 
   void equalPressed() {
@@ -284,5 +330,9 @@ class _HomePageState extends State<HomePage> {
     } else {
       return valor.toString();
     }
+  }
+
+  int contarOcorrencias(String texto, String caractere) {
+    return RegExp(RegExp.escape(caractere)).allMatches(texto).length;
   }
 }
